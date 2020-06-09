@@ -65,7 +65,7 @@ class Config:
             yield from self._parse_linters_line(line)
 
     def _parse_linters_line(self, line):
-        linters = (linter for linter in re.split(r'\s*,\s*', line))
+        linters = iter(re.split(r'\s*,\s*', line))
         for linter in linters:
             if linter in self._all_linters:
                 yield linter

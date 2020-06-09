@@ -60,12 +60,12 @@ class TestConfig(TestCase):
     @classmethod
     def _get_config(cls, all_linters=None, user_cfg=None, default_cfg=None):
         """Return real config with mocked ConfigParser."""
-        all_linters = all_linters or {}
         user_cfg = user_cfg or {}
         default_cfg = default_cfg or {}
         default = cls._get_config_parser({'yala': default_cfg})
         user = cls._get_config_parser({'yala': user_cfg})
         with patch('yala.config.ConfigParser', side_effect=(default, user)):
+            all_linters = all_linters or {}
             return Config(all_linters)
 
     @staticmethod
