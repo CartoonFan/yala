@@ -40,7 +40,8 @@ class Config:
         if "linters" in self._config:
             self.user_linters = list(self._parse_cfg_linters())
             self.linters = {
-                linter: self._all_linters[linter] for linter in self.user_linters
+                linter: self._all_linters[linter]
+                for linter in self.user_linters
             }
         else:
             self.linters = self._all_linters
@@ -77,7 +78,8 @@ class Config:
         """Return linter options without linter name prefix."""
         prefix = name + " "
         return {
-            k[len(prefix) :]: v for k, v in self._config.items() if k.startswith(prefix)
+            k[len(prefix):]: v
+            for k, v in self._config.items() if k.startswith(prefix)
         }
 
     @classmethod

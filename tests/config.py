@@ -36,7 +36,8 @@ class TestConfig(TestCase):
             "radon cc args: --min D",
             "radon mi args: --min D",
         ]
-        self.assertSequenceEqual(expected_lines, mock_stdout.getvalue().splitlines())
+        self.assertSequenceEqual(expected_lines,
+                                 mock_stdout.getvalue().splitlines())
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_dump_with_linters(self, mock_stdout):
@@ -55,7 +56,8 @@ class TestConfig(TestCase):
             "radon cc args: --min D",
             "radon mi args: --min D",
         ]
-        self.assertSequenceEqual(expected_lines, mock_stdout.getvalue().splitlines())
+        self.assertSequenceEqual(expected_lines,
+                                 mock_stdout.getvalue().splitlines())
 
     @classmethod
     def _get_config(cls, all_linters=None, user_cfg=None, default_cfg=None):
