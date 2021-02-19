@@ -56,15 +56,15 @@ class LinterRunner:
         try:
             stdout, stderr = self._lint()
             # Can't return a generator from a subprocess
-            return list(stdout), stderr or []
+            return list(stdout), self._format_stderr(stderr)
         except FileNotFoundError as exception:
             # Error if the linter was not found but was chosen by the user
             if self._linter.name in self.config.user_linters:
                 error_msg = 'Could not find {}. Did you install it? ' \
                     'Got exception: {}'.format(self._linter.name, exception)
-                return [[], [error_msg]]
+                return [], [error_msg]
             # If the linter was not chosen by the user, do nothing
-            return [[], []]
+            return [], []
 
     def _get_command(self):
         """Return command with options and targets, ready for execution."""
@@ -80,14 +80,14 @@ class LinterRunner:
                                  stderr=subprocess.PIPE, check=False)
         LOG.info('Finished %s', self._linter.name)
         stdout, stderr = self._get_output_lines(process)
-        return self._linter.parse(stdout), self._parse_stderr(stderr)
+        return self._linter.parse(stdout, stderr)
 
     @staticmethod
     def _get_output_lines(process):
         return [(line for line in output.decode('utf-8').splitlines() if line)
                 for output in (process.stdout, process.stderr)]
 
-    def _parse_stderr(self, lines):
+    def _format_stderr(self, lines):
         return ['[{}] {}'.format(self._linter.name, line) for line in lines]
 
 
@@ -119,11 +119,12 @@ class Main:
         LinterRunner.targets = targets
         linters = self._config.get_linter_classes()
         with Pool() as pool:
-            linter_cfg_tgts = ((l, self._config, targets) for l in linters)
-            out_err_none = pool.map(LinterRunner.run, linter_cfg_tgts)
-        out_err = [item for item in out_err_none if item is not None]
-        stdout, stderr = zip(*out_err)
-        return sorted(chain.from_iterable(stdout)), chain.from_iterable(stderr)
+            linter_cfg_tgts = ((linter, self._config, targets)
+                               for linter in linters)
+            linters_out_err = pool.map(LinterRunner.run, linter_cfg_tgts)
+        stdouts, stderrs = zip(*linters_out_err)
+        return (sorted(chain.from_iterable(stdouts)),
+                chain.from_iterable(stderrs))
 
     def run_from_cli(self, args):
         """Read arguments, run and print results.

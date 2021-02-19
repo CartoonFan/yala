@@ -26,7 +26,7 @@ class TestAcceptance(TestCase):
         cls._exit = exit_mock
         # Replace multiprocessing by Python threads
         pool_mock.return_value = ThreadPoolExecutor()
-        with patch('yala.main.sys.argv', ['yala', 'tests_data/fake_code.py']):
+        with patch('yala.main.sys.argv', ['yala', 'tests_data/']):
             main()
         cls._output = stdout_mock.getvalue()
 
@@ -53,7 +53,7 @@ class TestAcceptance(TestCase):
     @staticmethod
     def _get_expected_regex(line, linter_name):
         """Return a regex to match both Linux and Windows paths."""
-        regex = r'.*?^tests_data[/\\]fake_code.py\|{} \[{}\]$'
+        regex = r'.*?^tests_data[/\\].*.py\|{} \[{}\]$'
         escaped_output = re.escape(line)
         return regex.format(escaped_output, linter_name)
 
@@ -73,7 +73,7 @@ class TestAcceptance(TestCase):
 
     def test_isort(self):
         """Check isort output."""
-        expected = 'None:None|Imports are incorrectly sorted.'
+        expected = 'None:None|Imports are incorrectly sorted and/or formatted.'
         self._assert_result(expected, 'isort')
 
     def test_mypy(self):
@@ -114,9 +114,15 @@ class TestAcceptance(TestCase):
             '1:0|Unused import os (W0611, unused-import)',
             '2:0|Unused import abc (W0611, unused-import)',
             '7:0|Too many branches (20/12) (R0912, too-many-branches)',
-            '7:20|No space allowed before bracket\n'
-            'def high_complexity (arg):\n'
-            '                    ^ (C0326, bad-whitespace)'
+            '1:0|Similar lines in 2 files\n'
+            '==tests_data.duplicate1:3\n'
+            '==tests_data.duplicate2:3\n'
+            'def dummy_function():\n'
+            '    """Must have at least four lines."""\n'
+            '    aaa = 0\n'
+            '    bbb = 1\n'
+            '    ccc = 2\n'
+            '    print(aaa + bbb + ccc) (R0801, duplicate-code)',
         )
         self._assert_results(expected, 'pylint')
 

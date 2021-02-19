@@ -38,7 +38,7 @@ setup(
     packages=['yala'],
     install_requires=[
         'docopt',
-        'isort',
+        'isort>=5',  # deprecated --recursive flag
         'pycodestyle',
         'pylint',
     ],
@@ -49,7 +49,7 @@ setup(
             'pyflakes',
             'radon',
         ],
-        'flake8': ['flake8'],
+        'flake8': ['flake8', 'flake8-polyfill'],
         'mypy': ['mypy'],
         'pydocstyle': ['pydocstyle'],
         'pyflakes': ['pyflakes'],
@@ -59,7 +59,6 @@ setup(
             'bandit',
             'coverage',
             'eradicate',
-            'pipenv',
             'rstcheck',
             'safety',
             'tox',
